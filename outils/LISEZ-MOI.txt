@@ -1,0 +1,16 @@
+HARETOOL 0.2.0 - aide contre la confusion du Comte Harebourg (Dofus 3)
+
+1. Garde ce dossier entier (ne sors pas Haretool.exe du dossier).
+2. Lance Haretool.exe. Windows demande les droits administrateur : accepte
+   (ils servent a lire le reseau avec l'outil de capture integre a Windows).
+3. La fenetre s'ouvre, et la coiffe du Comte reste pres de l'horloge.
+   En combat, des que le Comte est la, Haretool dessine pour chaque monstre
+   la case ou cliquer (epee de la couleur du monstre).
+
+Rien a calibrer. Si le dessin est un peu decale : reglages, fleches "Reglage fin".
+
+Haretool ne touche pas au jeu (aucune lecture de sa memoire, aucun clic a ta
+place). Lire son trafic reste contraire aux conditions d'utilisation d'Ankama :
+tu l'utilises a tes risques. Outil non affilie a Ankama.
+
+Un bug, une question : https://github.com/haretool/haretool/issues

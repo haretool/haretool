@@ -1,0 +1,16 @@
+HARETOOL 0.2.0 pour macOS (BETA) - aide contre la confusion du Comte Harebourg (Dofus 3)
+
+Version beta : pas encore confirmee par des joueurs sur Mac. Un bug, une question :
+https://github.com/haretool/haretool/issues
+
+1. Garde Haretool.app et "Lancer Haretool.command" dans le meme dossier.
+2. Premiere fois : clic droit sur "Lancer Haretool.command" > Ouvrir > Ouvrir
+   (macOS bloque les applications non signees ; ce clic droit l'autorise une fois).
+3. Le Terminal s'ouvre et demande ton mot de passe de session Mac : il sert a
+   autoriser la lecture du reseau (capture des paquets du jeu). Rien n'est envoye.
+4. Pour voir les noms des personnages : Reglages Systeme > Confidentialite et securite >
+   Enregistrement de l'ecran > autoriser Haretool (sinon il marche avec un seul compte).
+
+Haretool ne touche pas au jeu (aucune lecture de sa memoire, aucun clic a ta place).
+Lire son trafic reste contraire aux conditions d'utilisation d'Ankama : tu l'utilises
+a tes risques. Outil non affilie a Ankama.

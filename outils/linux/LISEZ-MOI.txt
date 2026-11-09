@@ -1,0 +1,18 @@
+HARETOOL 0.2.0 pour Linux (BETA) - aide contre la confusion du Comte Harebourg (Dofus 3)
+
+Version beta : pas encore confirmee par des joueurs sous Linux. Un bug, une question :
+https://github.com/haretool/haretool/issues
+
+1. Decompresse l'archive et garde le dossier Haretool entier.
+2. Une seule fois, dans un terminal ouvert dans ce dossier :
+       ./installer-droits.sh
+   (demande ton mot de passe : donne a Haretool le seul droit de lire le reseau,
+   cap_net_raw ; il n'a pas besoin d'etre lance en root ensuite).
+3. Lance ./Haretool/Haretool (ou double-clic dessus).
+
+Besoins : X11 ou Wayland avec XWayland (Dofus tourne sous XWayland), libpcap
+(paquet libpcap0.8 ou libpcap, deja present sur la plupart des distributions).
+
+Haretool ne touche pas au jeu (aucune lecture de sa memoire, aucun clic a ta place).
+Lire son trafic reste contraire aux conditions d'utilisation d'Ankama : tu l'utilises
+a tes risques. Outil non affilie a Ankama.

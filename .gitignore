@@ -1,0 +1,14 @@
+dist/
+build/
+__pycache__/
+*.spec.bak
+captures/
+.superpowers/
+.pytest_cache/
+Haretool.spec
+*.etl
+build-nuitka/
+build-dossier/
+dist-dossier/
+# captures réelles : jamais publiées (noms de joueurs, chat)
+tests/fixtures/

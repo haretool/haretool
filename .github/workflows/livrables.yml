@@ -1,0 +1,99 @@
+# Fabrique les livrables macOS et Linux (un exe Mac ne se fabrique que sur un Mac).
+# Lancement : onglet Actions > « Livrables » > Run workflow, ou en poussant une étiquette v*.
+name: Livrables
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+env:
+  VERSION: "0.2.0"
+  NUITKA_COMMUN: >-
+    --standalone --assume-yes-for-downloads --enable-plugin=pyside6
+    --include-data-dir=haretool/donnees=haretool/donnees
+    --include-data-files=haretool/donnees/cartes.bin=haretool/donnees/cartes.bin
+    --include-data-dir=haretool/icones=haretool/icones
+    --include-data-dir=haretool/polices=haretool/polices
+    --python-flag=no_docstrings --python-flag=no_asserts
+    --nofollow-import-to=tkinter,UnityPy,pytest,PIL,fontTools
+    --output-dir=build-nuitka
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04          # glibc 2.35 : tourne sur les distributions récentes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dépendances
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y patchelf ccache libpcap0.8 libegl1 libgl1 libxkbcommon-x11-0 \
+            libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xinerama0 libxcb-randr0 \
+            libxcb-render-util0 libxcb-image0 libdbus-1-3 libfontconfig1
+          pip install pyside6==6.12.0 nuitka zstandard python-xlib pytest
+      - name: Tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q
+      - name: Compilation
+        run: python -m nuitka $NUITKA_COMMUN --include-package=Xlib --output-filename=Haretool lancer.py
+      - name: Archive
+        run: |
+          mkdir -p sortie/Haretool-linux
+          cp -r build-nuitka/lancer.dist sortie/Haretool-linux/Haretool
+          cp outils/linux/LISEZ-MOI.txt outils/linux/installer-droits.sh sortie/Haretool-linux/
+          chmod +x sortie/Haretool-linux/installer-droits.sh sortie/Haretool-linux/Haretool/Haretool
+          tar -C sortie -czf Haretool-$VERSION-linux.tar.gz Haretool-linux
+          sha256sum Haretool-$VERSION-linux.tar.gz | tee SHA256-linux.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: haretool-linux
+          path: |
+            Haretool-*-linux.tar.gz
+            SHA256-linux.txt
+
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15       # Apple Silicon (M1, M2, M3…)
+            arch: apple-silicon
+          - runner: macos-15-intel # Mac Intel
+            arch: intel
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dépendances
+        run: pip install pyside6==6.12.0 nuitka zstandard imageio pyobjc-framework-Quartz pyobjc-framework-Cocoa pytest
+      - name: Tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q
+      - name: Compilation
+        run: >-
+          python -m nuitka $NUITKA_COMMUN
+          --macos-create-app-bundle --macos-app-name=Haretool --macos-app-icon=haretool/icones/coiffe.png
+          --macos-app-version=$VERSION
+          --include-module=Quartz --include-module=AppKit
+          --output-filename=HaretoolApp lancer.py
+      - name: Archive
+        run: |
+          mkdir -p "sortie/Haretool-macos"
+          cp -R build-nuitka/lancer.app "sortie/Haretool-macos/Haretool.app"
+          cp outils/mac/LISEZ-MOI.txt "outils/mac/Lancer Haretool.command" sortie/Haretool-macos/
+          chmod +x "sortie/Haretool-macos/Lancer Haretool.command"
+          ditto -c -k --keepParent sortie/Haretool-macos Haretool-$VERSION-macos-${{ matrix.arch }}.zip
+          shasum -a 256 Haretool-$VERSION-macos-${{ matrix.arch }}.zip | tee SHA256-macos-${{ matrix.arch }}.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: haretool-macos-${{ matrix.arch }}
+          path: |
+            Haretool-*-macos-*.zip
+            SHA256-macos-*.txt
