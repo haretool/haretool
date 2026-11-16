@@ -1,4 +1,4 @@
-HARETOOL 0.2.0 pour Linux (BETA) - aide contre la confusion du Comte Harebourg (Dofus 3)
+HARETOOL 0.3.0 pour Linux (BETA) - aide contre la confusion du Comte Harebourg (Dofus 3)
 
 Version beta : pas encore confirmee par des joueurs sous Linux. Un bug, une question :
 https://github.com/haretool/haretool/issues
@@ -12,6 +12,9 @@ https://github.com/haretool/haretool/issues
 
 Besoins : X11 ou Wayland avec XWayland (Dofus tourne sous XWayland), libpcap
 (paquet libpcap0.8 ou libpcap, deja present sur la plupart des distributions).
+
+Nouveau en 0.3.0 : les teleportations et echanges de place (Xelor...) sont suivis.
+(L'apercu de zone en cases blanches est pour l'instant sur Windows seulement.)
 
 Haretool ne touche pas au jeu (aucune lecture de sa memoire, aucun clic a ta place).
 Lire son trafic reste contraire aux conditions d'utilisation d'Ankama : tu l'utilises

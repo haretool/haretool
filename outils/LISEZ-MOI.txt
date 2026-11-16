@@ -1,4 +1,4 @@
-HARETOOL 0.2.0 - aide contre la confusion du Comte Harebourg (Dofus 3)
+HARETOOL 0.3.0 - aide contre la confusion du Comte Harebourg (Dofus 3)
 
 1. Garde ce dossier entier (ne sors pas Haretool.exe du dossier).
 2. Lance Haretool.exe. Windows demande les droits administrateur : accepte
@@ -6,6 +6,10 @@ HARETOOL 0.2.0 - aide contre la confusion du Comte Harebourg (Dofus 3)
 3. La fenetre s'ouvre, et la coiffe du Comte reste pres de l'horloge.
    En combat, des que le Comte est la, Haretool dessine pour chaque monstre
    la case ou cliquer (epee de la couleur du monstre).
+
+Nouveau en 0.3.0 : quand tu vises un sort de zone, des cases blanches montrent
+ou il tombera vraiment (Windows). Les teleportations et teleportations-echanges
+(Xelor...) sont suivies.
 
 Rien a calibrer. Si le dessin est un peu decale : reglages, fleches "Reglage fin".
 

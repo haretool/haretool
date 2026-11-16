@@ -1,4 +1,4 @@
-HARETOOL 0.2.0 pour macOS (BETA) - aide contre la confusion du Comte Harebourg (Dofus 3)
+HARETOOL 0.3.0 pour macOS (BETA) - aide contre la confusion du Comte Harebourg (Dofus 3)
 
 Version beta : pas encore confirmee par des joueurs sur Mac. Un bug, une question :
 https://github.com/haretool/haretool/issues
@@ -10,6 +10,9 @@ https://github.com/haretool/haretool/issues
    autoriser la lecture du reseau (capture des paquets du jeu). Rien n'est envoye.
 4. Pour voir les noms des personnages : Reglages Systeme > Confidentialite et securite >
    Enregistrement de l'ecran > autoriser Haretool (sinon il marche avec un seul compte).
+
+Nouveau en 0.3.0 : les teleportations et echanges de place (Xelor...) sont suivis.
+(L'apercu de zone en cases blanches est pour l'instant sur Windows seulement.)
 
 Haretool ne touche pas au jeu (aucune lecture de sa memoire, aucun clic a ta place).
 Lire son trafic reste contraire aux conditions d'utilisation d'Ankama : tu l'utilises

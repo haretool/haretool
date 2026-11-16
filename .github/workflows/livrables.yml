@@ -8,7 +8,7 @@ on:
     tags: ["v*"]
 
 env:
-  VERSION: "0.2.0"
+  VERSION: "0.3.0"
   NUITKA_COMMUN: >-
     --standalone --assume-yes-for-downloads --enable-plugin=pyside6
     --include-data-dir=haretool/donnees=haretool/donnees
