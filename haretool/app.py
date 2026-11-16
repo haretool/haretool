@@ -30,8 +30,9 @@ from .marques import marques                                           # noqa: E
 from .overlay import Overlay                                           # noqa: E402
 from .protocole import EMBARQUE, URL_OFFICIELLE, Protocole                             # noqa: E402
 from .reglages import Reglages                                         # noqa: E402
-from .terrain import est_harebourg                                     # noqa: E402
-from . import theme                                                    # noqa: E402
+from .terrain import est_harebourg, jouables                           # noqa: E402
+from .zone import cases_rouges, zone_reelle                            # noqa: E402
+from . import capture_ecran, theme                                     # noqa: E402
 
 journal = logging.getLogger("haretool")
 ID_RACCOURCI = 0x4854
@@ -150,6 +151,7 @@ class Application:
 
         self.minuteur_paquets = QTimer(timeout=self._traiter_paquets)
         self.minuteur_fenetres = QTimer(timeout=self._rafraichir)
+        self.minuteur_zone = QTimer(timeout=self._apercu_zone)
 
     # -------------------------------------------------------------- vie
 
@@ -164,6 +166,8 @@ class Application:
         journal.info("écoute démarrée, protocole %s (%s), essai=%s", self.protocole.version, self.origine, self.essai)
         self.minuteur_paquets.start(30)
         self.minuteur_fenetres.start(200)
+        if capture_ecran.disponible():
+            self.minuteur_zone.start(100)
         self.montrer_reglages()          # à l'ouverture, la fenêtre est là (fermer = reste près de l'horloge)
 
     def ecrire_capture(self):
@@ -255,6 +259,7 @@ class Application:
             e = c.etat
             ok = ok and e.protocole_ok
             f = self._fenetre_de(c, fenetres)
+            c.devant_reel = f is not None and f.devant and not f.reduite   # pour l'aperçu de zone
             if f is not None and self.fenetre.isActiveWindow():
                 f = f._replace(devant=True)     # on règle : le dessin reste visible
             c.fenetre = f
@@ -264,6 +269,7 @@ class Application:
             nom = e.nom_perso or f"compte {c.cle[1]}"
             actif = self.reglages.actif_par_compte.get(nom, True) and not self.en_pause
             cal = self.calibrages.pour(f.rect[2], f.rect[3]) if f else None
+            c.cal = cal
             dessin = marques(e, options) if actif else []
             if actif and dessin and cal is not None:
                 c.overlay.afficher(dessin, cal)
@@ -283,6 +289,32 @@ class Application:
                                      calibre_auto=bool(f) and self.calibrages.exact(f.rect[2], f.rect[3]) is None))
         self.fenetre.maj_comptes(etats)
         self.fenetre.maj_protocole(self.protocole.version, self.origine, ok)
+
+    def _apercu_zone(self) -> None:
+        """Lit la zone rouge que le jeu dessine et la redessine là où le sort tombe vraiment.
+        Seulement si le jeu est vraiment devant et que nos dessins sont exclus de la copie
+        d'écran : sinon on pourrait relire nos propres losanges (un contour faux est pire que rien)."""
+        for c in self.comptes.comptes():
+            o = c.overlay
+            if o is None:
+                continue
+            zone: list[int] = []
+            e, f, cal = c.etat, c.fenetre, c.cal
+            if (self.reglages.apercu_zone and not self.en_pause and o.isVisible() and o.exclue_des_copies
+                    and c.devant_reel and f is not None and cal is not None
+                    and e.moi in e.positions):
+                q = tranche_de(e)
+                img = capture_ecran.copier(f.rect) if q is not None else None
+                if img is not None:
+                    jouable = jouables(e.carte)
+                    rouges = cases_rouges(img, cal, jouable if jouable is not None else range(560))
+                    zone = zone_reelle(e.positions[e.moi], rouges, q, e.lignes_melee, jouable)
+                    if (sorted(rouges), zone) != getattr(c, "_zone_vue", None):
+                        c._zone_vue = (sorted(rouges), zone)
+                        if rouges:
+                            journal.info("zone : moi=%s quarts=%s mêlée=%s rouges=%s → blanches=%s",
+                                         e.positions[e.moi], q, e.lignes_melee, sorted(rouges), zone)
+            o.afficher_zone(zone)
 
     def _compte(self, cle: str) -> Compte | None:
         return next((c for c in self.comptes.comptes() if f"{c.cle[0]}:{c.cle[1]}" == cle), None)

@@ -25,6 +25,7 @@ class Reglages:
     montrer_ldv: bool = True
     montrer_avertissements: bool = True
     montrer_allies: bool = True
+    apercu_zone: bool = True                                   # contour blanc : où le sort tombe vraiment
     raccourci: str = "Ctrl+Alt+H"
     reglage_fin: dict = field(default_factory=dict)            # calibrages corrigés aux flèches, par taille de fenêtre
     url_protocole: str | None = None

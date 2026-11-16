@@ -55,3 +55,8 @@ def case_a_cliquer(moi: int, cible: int, quarts: int, lignes_melee: int) -> int 
     for _ in range((quarts + lignes_melee) % 4):
         du, dv = rot_ccw(du, dv)
     return vers_case(pm[0] + du, pm[1] + dv)
+
+
+def case_touchee(moi: int, clic: int, quarts: int, lignes_melee: int) -> int | None:
+    """L'inverse de case_a_cliquer : où tombe vraiment un sort lancé sur `clic`."""
+    return case_a_cliquer(moi, clic, -(quarts + lignes_melee) % 4, 0)

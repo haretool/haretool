@@ -155,3 +155,62 @@ def test_enregistrement_brut_des_paquets(monkeypatch, tmp_path):
     assert len(d["paquets"]) == len(combat(11, 3000)) and d["paquets"][0]["flux"] == "10.0.0.2:50001"
     assert d["paquets"][0]["sens"] == "serveur->client" and d["paquets"][0]["hex"]
     a.icone.hide()
+
+
+class _DessinFaux:
+    def __init__(self, exclue=True):
+        self.exclue_des_copies, self.zones = exclue, []
+
+    def isVisible(self):
+        return True
+
+    def afficher_zone(self, cases):
+        self.zones.append(list(cases))
+
+
+def _compte_en_combat(monkeypatch, tmp_path, exclue=True):
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+    from PySide6.QtWidgets import QApplication
+    from haretool import app as module_app
+    from haretool.calibrage import REFERENCE
+    from haretool.fenetres import FenetreJeu
+    from test_zone import image_unie
+    qapp = QApplication.instance() or QApplication([])
+    a = module_app.Application(qapp, essai=True)
+    for p in paquets(50002, combat(11, 3000)):
+        a.comptes.sur_paquet(p, 0)
+    c = a.comptes.comptes()[0]
+    c.etat.quarts_force, c.etat.moi = 1, 11      # « moi » se lit au tour : posé à la main ici
+    c.overlay, c.cal, c.devant_reel = _DessinFaux(exclue), REFERENCE[1], True
+    c.fenetre = FenetreJeu(1, "x", (0, 0, 2560, 1440), False, True)
+    rouge = vers_case(16, 6)
+    monkeypatch.setattr(module_app.capture_ecran, "copier", lambda rect: image_unie((209, 80, 72), cases=(rouge,)))
+    return a, c, rouge
+
+
+def test_apercu_zone_tourne_la_zone_lue(monkeypatch, tmp_path):
+    from haretool.zone import zone_reelle
+    a, c, rouge = _compte_en_combat(monkeypatch, tmp_path)
+    a._apercu_zone()
+    e = c.etat
+    assert c.overlay.zones[-1] == zone_reelle(e.positions[e.moi], [rouge], 1, e.lignes_melee)
+    assert c.overlay.zones[-1] and c.overlay.zones[-1] != [rouge]
+    a.icone.hide()
+
+
+def test_apercu_zone_muet_si_nos_dessins_seraient_relus(monkeypatch, tmp_path):
+    a, c, _ = _compte_en_combat(monkeypatch, tmp_path, exclue=False)
+    a._apercu_zone()
+    assert c.overlay.zones[-1] == []
+    a.icone.hide()
+
+
+def test_apercu_zone_muet_si_le_jeu_n_est_pas_devant(monkeypatch, tmp_path):
+    a, c, _ = _compte_en_combat(monkeypatch, tmp_path)
+    c.devant_reel = False
+    a._apercu_zone()
+    assert c.overlay.zones[-1] == []
+    a.reglages.apercu_zone, c.devant_reel = False, True
+    a._apercu_zone()
+    assert c.overlay.zones[-1] == []
+    a.icone.hide()

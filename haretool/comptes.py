@@ -21,6 +21,8 @@ class Compte:
     dernier: float = 0.0
     fenetre: Any = None
     overlay: Any = None
+    cal: Any = None              # calibrage de la fenêtre suivie (dernier rafraîchissement)
+    devant_reel: bool = False    # le jeu est vraiment devant (pas seulement la fenêtre de réglages)
 
 
 class Comptes:

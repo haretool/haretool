@@ -1,6 +1,6 @@
 {
- "version": "2026-11-09",
- "note": "Mesuré sur deux captures du 09/11/2026 (jeu 3.7.13.17). Dégâts : 37.6 = PV perdus, 37.1 = érosion. iib = PV absolus (Songes). null = pas encore mesuré.",
+ "version": "2026-11-16",
+ "note": "Mesuré sur deux captures du 09/11/2026 (jeu 3.7.13.17). Dégâts : 37.6 = PV perdus, 37.1 = érosion. iib = PV absolus (Songes). null = pas encore mesuré. 16/11 : téléportation 20={1 case, 2 acteur} (effet 4) et échange 4={1 autre, 2 case du lanceur (36), 3 case de l'autre} (effet 8), relevés sur un Xélor.",
  "messages": {
   "pv_absolus": {
    "nom": "kqo",
@@ -73,11 +73,26 @@
      3,
      2
     ],
-    "teleport_acteur": null,
-    "teleport_case": null,
-    "echange_case_lanceur": null,
-    "echange_autre": null,
-    "echange_case_autre": null,
+    "teleport_acteur": [
+     20,
+     2
+    ],
+    "teleport_case": [
+     20,
+     1
+    ],
+    "echange_case_lanceur": [
+     4,
+     2
+    ],
+    "echange_autre": [
+     4,
+     1
+    ],
+    "echange_case_autre": [
+     4,
+     3
+    ],
     "degats_erosion": [
      37,
      1

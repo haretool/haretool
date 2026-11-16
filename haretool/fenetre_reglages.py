@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QCheckBox, QColorDialog, QComboBox, QFrame, QGrid
                                QKeySequenceEdit, QLabel, QPushButton, QScrollArea, QSlider, QVBoxLayout,
                                QWidget)
 
-from . import theme
+from . import capture_ecran, theme
 from .reglages import Reglages
 
 LARGEUR, HAUTEUR = 1040, 640
@@ -328,9 +328,13 @@ class FenetreReglages(QWidget):
             g.addWidget(valeur, rang, 2)
             setattr(self, "opacite" if nom == "opacite" else "taille", s)
             rang += 1
-        for nom, texte, aide in (("montrer_losange_mob", "Losange sous les cibles", None),
-                                 ("montrer_ldv", "Cibles hors de vue", "Œil barré sur les cibles hors de vue"),
-                                 ("montrer_avertissements", "Avertissements", "Case morte, hors carte")):
+        cases = [("montrer_losange_mob", "Losange sous les cibles", None),
+                 ("montrer_ldv", "Cibles hors de vue", "Œil barré sur les cibles hors de vue"),
+                 ("montrer_avertissements", "Avertissements", "Case morte, hors carte")]
+        if capture_ecran.disponible():
+            cases.append(("apercu_zone", "Aperçu de zone",
+                          "Contour blanc sur les cases où le sort visé tombe vraiment"))
+        for nom, texte, aide in cases:
             c = QCheckBox()
             c.setChecked(getattr(r, nom))
             c.toggled.connect(lambda val, n=nom: self._poser(n, val))

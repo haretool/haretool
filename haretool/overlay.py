@@ -17,11 +17,13 @@ from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtWidgets import QApplication, QWidget
 
 from .calibrage import Calibrage
+from .capture_ecran import exclure_des_copies
 from .fenetres import FenetreJeu
 from .marques import Marque
 
 ICONES = Path(__file__).parent / "icones"
 TAILLE_ICONE = 0.8          # côté de l'icône, en hauteur de case
+BLANC_ZONE = "#FFFFFF"      # contour des cases où le sort tombe vraiment
 
 GWL_EXSTYLE = -20
 WS_EX_LAYERED = 0x00080000
@@ -59,6 +61,8 @@ class Overlay(QWidget):
         self._opacite = 0.85
         self._taille_icones = 1.0
         self._fenetre: FenetreJeu | None = None
+        self._zone: list[int] = []
+        self.exclue_des_copies = False     # vrai quand nos dessins n'apparaissent pas dans une copie d'écran
 
     # -------------------------------------------------------------- réglages
 
@@ -84,6 +88,11 @@ class Overlay(QWidget):
             self._marques, self._cal = marques, cal
             self.update()
 
+    def afficher_zone(self, cases: list[int]) -> None:
+        if cases != self._zone:
+            self._zone = list(cases)
+            self.update()
+
     # -------------------------------------------------------------- Windows
 
     def _traversable(self) -> None:
@@ -94,6 +103,7 @@ class Overlay(QWidget):
         hwnd = int(self.winId())
         style = u32.GetWindowLongW(hwnd, GWL_EXSTYLE) | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE
         u32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
+        self.exclue_des_copies = exclure_des_copies(hwnd)
 
     def showEvent(self, e) -> None:
         super().showEvent(e)
@@ -118,6 +128,18 @@ class Overlay(QWidget):
                 p.drawPolygon(poly)
             elif rect is not None:
                 QSvgRenderer(QByteArray(icone_svg(m.forme, m.couleur))).render(p, rect)
+        if self._zone:          # par-dessus tout le reste : case blanche pleine, fond semi-transparent
+            p.setOpacity(1.0)
+            fond = QColor(BLANC_ZONE)
+            fond.setAlphaF(0.5 * self._opacite)       # suit le curseur « Opacité »
+            p.setBrush(QBrush(fond))
+            p.setPen(QPen(QColor(BLANC_ZONE), max(2.0, self._cal.hauteur / 18), Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            l, h = self._cal.taille_losange()
+            l, h = l * 0.46, h * 0.46      # un léger retrait : chaque case reste distincte
+            for case in self._zone:
+                cx, cy = self._cal.pixel(case)
+                p.drawPolygon(QPolygonF([QPointF(cx, cy - h), QPointF(cx + l, cy),
+                                         QPointF(cx, cy + h), QPointF(cx - l, cy)]))
         p.end()
 
 
