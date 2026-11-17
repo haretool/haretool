@@ -2,7 +2,7 @@
 # sans bytecode Python à décompiler, docstrings retirées. Puis audit « aucune trace » et empreinte.
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
-$version = "0.3.0"
+$version = "0.3.1"
 
 python -m pytest -q
 if ($LASTEXITCODE -ne 0) { throw "tests en échec" }

@@ -31,7 +31,7 @@ from .overlay import Overlay                                           # noqa: E
 from .protocole import EMBARQUE, URL_OFFICIELLE, Protocole                             # noqa: E402
 from .reglages import Reglages                                         # noqa: E402
 from .terrain import est_harebourg, jouables                           # noqa: E402
-from .zone import cases_rouges, zone_reelle                            # noqa: E402
+from .zone import cases_rouges, sans_cercles, zone_reelle                            # noqa: E402
 from . import capture_ecran, theme                                     # noqa: E402
 
 journal = logging.getLogger("haretool")
@@ -308,12 +308,14 @@ class Application:
                 if img is not None:
                     jouable = jouables(e.carte)
                     rouges = cases_rouges(img, cal, jouable if jouable is not None else range(560))
+                    monstres = sorted(case for ident, case in e.positions.items() if ident < 0)
+                    rouges = sans_cercles(rouges, monstres)
                     zone = zone_reelle(e.positions[e.moi], rouges, q, e.lignes_melee, jouable)
                     if (sorted(rouges), zone) != getattr(c, "_zone_vue", None):
                         c._zone_vue = (sorted(rouges), zone)
                         if rouges:
-                            journal.info("zone : moi=%s quarts=%s mêlée=%s rouges=%s → blanches=%s",
-                                         e.positions[e.moi], q, e.lignes_melee, sorted(rouges), zone)
+                            journal.info("zone : moi=%s quarts=%s mêlée=%s rouges=%s → blanches=%s monstres=%s",
+                                         e.positions[e.moi], q, e.lignes_melee, sorted(rouges), zone, monstres)
             o.afficher_zone(zone)
 
     def _compte(self, cle: str) -> Compte | None:

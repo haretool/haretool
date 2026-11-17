@@ -108,3 +108,18 @@ def test_vraies_images(nom):
     attendu = VUES[nom]
     assert trouve - attendu == set(), "faux rouge"          # jamais de contour faux
     assert len(trouve & attendu) >= 0.7 * len(attendu)      # les cases sous un perso peuvent manquer
+
+
+def test_cercle_isole_sous_un_monstre_ignore():
+    """Le cercle rouge d'un monstre immobile (le Comte) ne doit pas laisser de case fantôme."""
+    from haretool.zone import sans_cercles
+    assert sans_cercles({455}, [455]) == set()
+    assert sans_cercles({455, 304}, [455]) == {304}
+
+
+def test_vraie_zone_sur_un_monstre_gardee():
+    from haretool.grille import adjacentes
+    from haretool.zone import sans_cercles
+    voisine = next(c for c in range(560) if adjacentes(300, c))
+    assert sans_cercles({300, voisine}, [300]) == {300, voisine}
+    assert sans_cercles({300}, []) == {300}      # case vide : rien ne change

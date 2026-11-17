@@ -13,6 +13,7 @@ from __future__ import annotations
 from typing import Iterable, NamedTuple
 
 from .confusion import case_touchee
+from .grille import adjacentes
 
 LARGEUR_MESUREE = 124.0     # largeur d'une case quand les seuils ont été mesurés (2560×1440)
 
@@ -64,6 +65,17 @@ def est_rouge(img: ImageEcran, cal, case: int) -> bool:
 
 def cases_rouges(img: ImageEcran, cal, cases: Iterable[int]) -> set[int]:
     return {c for c in cases if est_rouge(img, cal, c)}
+
+
+def sans_cercles(rouges: Iterable[int], occupees: Iterable[int]) -> set[int]:
+    """Retire les cases rouges ISOLÉES sous un monstre : c'est son cercle d'équipe (même rouge
+    que la zone), pas un sort. Vu chez un utilisateur le 16/11 : le Comte, immobile, gardait
+    une case blanche fantôme tout le combat. Une vraie zone sur un monstre a des voisines
+    rouges et reste ; un sort à une cible sur un monstre est déjà montré par l'épée."""
+    rouges = set(rouges)
+    occupees = set(occupees)
+    return {c for c in rouges
+            if c not in occupees or any(adjacentes(c, d) for d in rouges if d != c)}
 
 
 def zone_reelle(moi: int, rouges: Iterable[int], quarts: int, lignes_melee: int,
